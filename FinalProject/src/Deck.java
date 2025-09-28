@@ -33,7 +33,7 @@ public class Deck {
     //Rút một lá bài từ trên cùng
     public Card drawCard() {
         if (cards.isEmpty()) {
-            throw new IllegalStateException("Deck đã hết bài!");
+            throw new IllegalStateException("Deck run out of card!");
         }
         return cards.remove(0);
     }

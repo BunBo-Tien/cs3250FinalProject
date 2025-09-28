@@ -23,6 +23,24 @@ public class Hand {
         return this.cards;
     }
     
+    
+     //Xóa tất cả các lá bài khỏi tay.
+    public void clear() {
+        cards.clear();
+    }
+
+    /**
+     * Trả về một chuỗi đại diện cho bài của nhà cái với lá bài đầu tiên bị ẩn.
+     * @return Chuỗi hiển thị bài với một lá bị úp.
+     */
+    public String toStringConcealed() {
+        if (cards.size() < 2) {
+            return "[Card Error]"; //Xử lý trường hợp không đủ bài
+        }
+        //Hiển thị lá đầu tiên là "[Bài úp]" và lá thứ hai
+        return "[No Show Card] | " + cards.get(1).toString();
+    }
+    
     public int calculateScore() {
         int score = 0;
         int numAces = 0;

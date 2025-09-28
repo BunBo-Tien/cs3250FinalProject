@@ -1,31 +1,19 @@
+import javafx.application.Application;
+
 /*
  * This is the demo of the black jack game. Some of the comment and console output is written in
  * vietnamese language for me to better understanding what's going on. 
  * 
  * This is the main class that use to execute the code.
+ *
+ * Lớp Main - Điểm khởi đầu (entry point) của ứng dụng JavaFX.
+ * Nhiệm vụ duy nhất của lớp này là khởi chạy lớp giao diện chính (BlackjackGUI).
  */
-
-import java.util.Scanner;
-
 public class Main {
-
-	public static void main(String[] args) {
-		//System.out.println("Welcome to my final project");
-		Scanner scanner = new Scanner(System.in);
-        String playAgain;
-
-        do {
-            System.out.println("---------------------------------");
-            System.out.println("Bắt đầu ván Blackjack mới!");
-            Game game = new Game();
-            game.playGame();
-            System.out.println("---------------------------------");
-            System.out.print("Bạn có muốn chơi tiếp không? (y/n): ");
-            playAgain = scanner.nextLine().toLowerCase();
-        } while (playAgain.equals("y"));
-
-        System.out.println("Cảm ơn bạn đã chơi! Hẹn gặp lại.");
-        scanner.close();
-	}
-
+    public static void main(String[] args) {
+        // Gọi phương thức launch của JavaFX Application,
+        // truyền vào lớp GUI chính của chúng ta.
+        Application.launch(BlackjackGUI.class, args);
+    }
 }
+

@@ -24,25 +24,22 @@ public class Player {
 
     //Phương thức để người chơi rút thêm bài từ bộ bài chính
     public void hit(Deck deck) {
-        System.out.println(this.name + " chọn Hit.");
         this.hand.addCard(deck.drawCard());
     }
 
     //Phương thức để người chơi dừng lại
     public void stand() {
-        System.out.println(this.name + " chọn Stand.");
+    	
     }
 
     //Hiển thị các lá bài trên tay
     public void showHand(boolean hideFirstCard) {
-        System.out.print(this.name + " có bài: ");
         if (hideFirstCard) {
             System.out.print("[Lá bài úp] ");
             //Hiển thị các lá bài còn lại
             for (int i = 1; i < this.hand.getCards().size(); i++) {
                 System.out.print(this.hand.getCards().get(i).toString() + " ");
             }
-            System.out.println();
         } else {
             System.out.println(this.hand.toString() + " (Điểm: " + this.hand.calculateScore() + ")");
         }
