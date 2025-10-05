@@ -130,18 +130,18 @@ public class BlackjackGUI extends Application {
     
     //This method refreshes the entire UI, now with images.
     private void updateView() {
-        // Clear previous cards
+        //Clear previous cards
         playerCardsBox.getChildren().clear();
         dealerCardsBox.getChildren().clear();
 
-        // Update player's cards and score
+        //Update player's cards and score
         for (Card card : game.getPlayer().getHand().getCards()) {
             ImageView cardImage = createCardImageView(card.getImagePath());
             playerCardsBox.getChildren().add(cardImage);
         }
         playerScoreLabel.setText(String.format("Bài của Bạn (%d)", game.getPlayer().getHand().calculateScore()));
 
-        // Update dealer's cards and score
+        //Update dealer's cards and score
         if (game.isGameOver()) {
             // Show all dealer cards
             for (Card card : game.getDealer().getHand().getCards()) {
@@ -150,7 +150,7 @@ public class BlackjackGUI extends Application {
             }
             dealerScoreLabel.setText(String.format("Bài của Nhà Cái (%d)", game.getDealer().getHand().calculateScore()));
         } else {
-            // Show one card and one card back
+            //Show one card and one card back
             dealerCardsBox.getChildren().add(createCardImageView("/cards/BACK.png"));
             if (game.getDealer().getHand().getCards().size() > 1) {
                 Card visibleCard = game.getDealer().getHand().getCards().get(1);
