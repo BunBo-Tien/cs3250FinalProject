@@ -4,94 +4,91 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 
 public class BlackjackGUI extends Application {
 
     private Game game;
 
+    //GUI elements we'll need to update.
     //Khai báo các thành phần GUI cần được cập nhật
-    //GUI elements we'll need to update as the game progresses.
-    private Label dealerHandLabel;
-    private Label playerHandLabel;
+    //Note: We're using HBox to hold card images instead of a simple Label.
+    private HBox dealerCardsBox;
+    private HBox playerCardsBox;
+    private Label dealerScoreLabel; 
+    private Label playerScoreLabel;
     private Label statusLabel;
     private Button hitButton;
     private Button standButton;
 
+    private final int CARD_WIDTH = 80; 
+
     @Override
     public void start(Stage primaryStage) {
-        //1. Khởi tạo đối tượng game từ lớp logic
-        //1. Game logic object.
         game = new Game();
 
-        //2. Thiết lập cửa sổ chính (Stage)
-        //2. Set up the main application window (the Stage).
-        primaryStage.setTitle("Blackjack");
-        primaryStage.setResizable(false);
-
-        //3. Tạo layout chính bằng BorderPane
-        //3. Main layout using a BorderPane.
+        primaryStage.setTitle("Trò chơi Blackjack");
         BorderPane rootLayout = new BorderPane();
         rootLayout.setPadding(new Insets(15));
-        rootLayout.setStyle("-fx-background-color: #35654d;"); // Màu nền xanh lá cây // A nice green background, like a card table.
+        rootLayout.setStyle("-fx-background-color: #35654d;");
 
-        //Phần trên: Tiêu đề
         //Top Section: Title
         Label titleLabel = new Label("Blackjack");
         titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
         rootLayout.setTop(titleLabel);
         BorderPane.setAlignment(titleLabel, Pos.CENTER);
+        BorderPane.setMargin(titleLabel, new Insets(0, 0, 20, 0));
 
-        //Phần giữa: Hiển thị thông tin game (dùng VBox)
-        //Center Section: Game info display (using a VBox)
-        VBox gameInfoPane = new VBox(25);
-        gameInfoPane.setAlignment(Pos.CENTER_LEFT);
-        gameInfoPane.setPadding(new Insets(20, 0, 20, 0));
 
-        //Label để hiển thị bài của nhà cái
-        //Label to show the dealer's hand.
-        dealerHandLabel = new Label();
-        dealerHandLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        //Center Section: Game area
+        VBox gameArea = new VBox(20);
+        gameArea.setAlignment(Pos.CENTER);
 
-        //Label để hiển thị bài của người chơi
-        //Label to show the player's hand.
-        playerHandLabel = new Label();
-        playerHandLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        //Dealer's area
+        VBox dealerArea = new VBox(10);
+        dealerArea.setAlignment(Pos.CENTER);
+        dealerScoreLabel = new Label("Bài của Nhà Cái:");
+        dealerScoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        dealerCardsBox = new HBox(-CARD_WIDTH / 2.5); // Negative spacing for card overlap effect
+        dealerCardsBox.setAlignment(Pos.CENTER);
+        dealerArea.getChildren().addAll(dealerScoreLabel, dealerCardsBox);
 
-        //Label để hiển thị trạng thái game
-        //This label shows the game status, like 'You win!', 'Bust!', etc.
+        //Player's area
+        VBox playerArea = new VBox(10);
+        playerArea.setAlignment(Pos.CENTER);
+        playerScoreLabel = new Label("Bài của Bạn:");
+        playerScoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        playerCardsBox = new HBox(-CARD_WIDTH / 2.5); // Negative spacing
+        playerCardsBox.setAlignment(Pos.CENTER);
+        playerArea.getChildren().addAll(playerScoreLabel, playerCardsBox);
+
+        //Status label
         statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 16px; -fx-font-style: italic; -fx-text-fill: #ffeb3b;");
 
-        gameInfoPane.getChildren().addAll(dealerHandLabel, playerHandLabel, statusLabel);
-        rootLayout.setCenter(gameInfoPane);
+        gameArea.getChildren().addAll(dealerArea, playerArea, statusLabel);
+        rootLayout.setCenter(gameArea);
 
-        //Phần dưới: Các nút điều khiển (dùng HBox)
-        //Bottom Section: Control buttons (using an HBox)
+        //Bottom Section: Control buttons
         HBox buttonPane = new HBox(15);
         buttonPane.setAlignment(Pos.CENTER);
 
-        //Nút "Rút bài" (Hit)
-        //The "Hit" button.
-        hitButton = new Button("Hit");
+        hitButton = new Button("Rút Bài (Hit)");
         hitButton.setOnAction(event -> handleHitAction());
 
-        //Nút "Dừng" (Stand)
-        //The "Stand" button.
-        standButton = new Button("Stand");
+        standButton = new Button("Dừng (Stand)");
         standButton.setOnAction(event -> handleStandAction());
 
-        //Nút "Ván mới"
-        //The "New Game" button.
-        Button newGameButton = new Button("New Game");
+        Button newGameButton = new Button("Ván Mới");
         newGameButton.setOnAction(event -> startNewGame());
         
-        //Thiết kế cho các nút
-        //A little styling for our buttons to make them look nice.
         for (Button btn : new Button[]{hitButton, standButton, newGameButton}) {
             btn.setStyle("-fx-background-color: #c9a43a; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
         }
@@ -100,21 +97,13 @@ public class BlackjackGUI extends Application {
         rootLayout.setBottom(buttonPane);
         BorderPane.setMargin(buttonPane, new Insets(20, 0, 0, 0));
 
-        //Bắt đầu ván chơi đầu tiên
-        //New game start
         startNewGame();
 
-        //4. Tạo Scene và hiển thị
-        //4. Create the Scene and show the stage.
-        Scene scene = new Scene(rootLayout, 600, 400);
+        Scene scene = new Scene(rootLayout, 700, 550);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     
-    /**
-     * Bắt đầu một ván chơi mới.
-     * Starts a new game.
-     */
     private void startNewGame() {
         game.startNewGame();
         hitButton.setDisable(false);
@@ -122,58 +111,72 @@ public class BlackjackGUI extends Application {
         updateView();
     }
 
-    /**
-     * Xử lý sự kiện khi người chơi nhấn nút "Hit".
-     * Handles what happens when the player clicks the "Hit" button.
-     */
     private void handleHitAction() {
         game.playerHits();
         updateView();
-        
-        if (game.isGameOver()) {
-            endTurn();
-        }
+        if (game.isGameOver()) endTurn();
     }
     
-    /**
-     * Xử lý sự kiện khi người chơi nhấn nút "Stand".
-     * Handles what happens when the player clicks the "Stand" button.
-     */
     private void handleStandAction() {
         game.playerStands();
         updateView();
         endTurn();
     }
     
-    /**
-     * Kết thúc lượt chơi, vô hiệu hóa các nút Hit và Stand.
-     * Ends the current turn by disabling the Hit and Stand buttons.
-     */
     private void endTurn() {
         hitButton.setDisable(true);
         standButton.setDisable(true);
     }
     
-    /**
-     * Cập nhật toàn bộ giao diện dựa trên trạng thái hiện tại của game.
-     * This method refreshes the entire UI based on the current state of the game.
-     */
+    //This method refreshes the entire UI, now with images.
     private void updateView() {
-        playerHandLabel.setText(String.format("Player Cards (%d): %s",
-                game.getPlayer().getHand().calculateScore(),
-                game.getPlayer().getHand().toString()));
+        // Clear previous cards
+        playerCardsBox.getChildren().clear();
+        dealerCardsBox.getChildren().clear();
 
-        if (game.isGameOver()) {
-            //If the game is over, show the dealer's final hand and score.
-            dealerHandLabel.setText(String.format("Dealer Cards (%d): %s",
-                    game.getDealer().getHand().calculateScore(),
-                    game.getDealer().getHand().toString()));
-        } else {
-            //Otherwise, keep the dealer's first card hidden.
-            dealerHandLabel.setText("Dealer Cards: " + game.getDealer().getHand().toStringConcealed());
+        // Update player's cards and score
+        for (Card card : game.getPlayer().getHand().getCards()) {
+            ImageView cardImage = createCardImageView(card.getImagePath());
+            playerCardsBox.getChildren().add(cardImage);
         }
+        playerScoreLabel.setText(String.format("Bài của Bạn (%d)", game.getPlayer().getHand().calculateScore()));
 
+        // Update dealer's cards and score
+        if (game.isGameOver()) {
+            // Show all dealer cards
+            for (Card card : game.getDealer().getHand().getCards()) {
+                ImageView cardImage = createCardImageView(card.getImagePath());
+                dealerCardsBox.getChildren().add(cardImage);
+            }
+            dealerScoreLabel.setText(String.format("Bài của Nhà Cái (%d)", game.getDealer().getHand().calculateScore()));
+        } else {
+            // Show one card and one card back
+            dealerCardsBox.getChildren().add(createCardImageView("/cards/BACK.png"));
+            if (game.getDealer().getHand().getCards().size() > 1) {
+                Card visibleCard = game.getDealer().getHand().getCards().get(1);
+                dealerCardsBox.getChildren().add(createCardImageView(visibleCard.getImagePath()));
+            }
+            dealerScoreLabel.setText("Bài của Nhà Cái");
+        }
         statusLabel.setText(game.getGameResult());
+    }
+
+    /**
+     * Phương thức trợ giúp để tạo một ImageView cho một lá bài.
+     * Nó tải hình ảnh từ thư mục resources và cấu hình kích thước cho ImageView.
+     * Helper method to create an ImageView for a card.
+     * It loads the image from the resources folder and configures the ImageView's size.
+     * * @param imagePath Đường dẫn đến tệp hình ảnh trong thư mục resources (ví dụ: "/cards/A-S.png").
+     * The path to the image file within the resources folder (e.g., "/cards/A-S.png").
+     * @return Một đối tượng ImageView đã được cấu hình. A configured ImageView node.
+     */
+    private ImageView createCardImageView(String imagePath) {
+        // Use getResource to ensure the image is loaded from the classpath (resources folder)
+        Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        ImageView imgView = new ImageView(img);
+        imgView.setFitWidth(CARD_WIDTH);
+        imgView.setPreserveRatio(true);
+        return imgView;
     }
 }
 
