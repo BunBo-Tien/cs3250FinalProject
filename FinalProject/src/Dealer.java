@@ -3,12 +3,12 @@
  * , rut bai, nhung co them quy tac rieng)
  */
 public class Dealer extends Player {
-    // Kế thừa các thuộc tính và phương thức từ lớp Player
+    //Inherits attributes and methods from the Player class
     public Dealer(String name) {
-        super(name); // Gọi constructor của lớp cha (Player)
+        super(name); //Calls the constructor of the parent class (Player)
     }
 
-    // Logic đặc biệt của Dealer: phải rút bài đến khi điểm >= 17
+    //Special Dealer logic: must draw cards until the score is 17 or higher
     public void play(Deck deck) {
         while (this.getHand().calculateScore() < 17) {      
             this.hit(deck);
