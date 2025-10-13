@@ -18,30 +18,13 @@ public class Player {
         return this.hand;
     }
 
+    //this will be extend later to let player put their name in and display on the GUI
     public String getName() {
         return this.name;
     }
 
-    //Phương thức để người chơi rút thêm bài từ bộ bài chính
+    //Method for player to hit from the Deck
     public void hit(Deck deck) {
         this.hand.addCard(deck.drawCard());
-    }
-
-    //Phương thức để người chơi dừng lại
-    public void stand() {
-    	
-    }
-
-    //Hiển thị các lá bài trên tay
-    public void showHand(boolean hideFirstCard) {
-        if (hideFirstCard) {
-            System.out.print("[Lá bài úp] ");
-            //Hiển thị các lá bài còn lại
-            for (int i = 1; i < this.hand.getCards().size(); i++) {
-                System.out.print(this.hand.getCards().get(i).toString() + " ");
-            }
-        } else {
-            System.out.println(this.hand.toString() + " (Điểm: " + this.hand.calculateScore() + ")");
-        }
     }
 }

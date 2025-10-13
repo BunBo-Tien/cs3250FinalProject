@@ -4,17 +4,15 @@
 import java.util.ArrayList;
 
 public class Hand {
-    // Đây là danh sách các lá bài trong tay. 
-    // Chúng ta dùng 'private' để đảm bảo chỉ có các phương thức của lớp này mới có thể thay đổi nó.
+
     private ArrayList<Card> cards;
 
-    //Hàm khởi tạo (constructor) của lớp Hand.
-    //Khi một đối tượng Hand được tạo, nó sẽ khởi tạo một ArrayList rỗng.
+ 
     public Hand() {
         this.cards = new ArrayList<Card>();
     }
     
-    //Phương thức này cho phép thêm một lá bài vào tay.
+
     public void addCard(Card card) {
         this.cards.add(card);
     }
@@ -24,23 +22,12 @@ public class Hand {
     }
     
     
-     //Xóa tất cả các lá bài khỏi tay.
+    //Clear all the card on hand
     public void clear() {
         cards.clear();
     }
-
-    /**
-     * Trả về một chuỗi đại diện cho bài của nhà cái với lá bài đầu tiên bị ẩn.
-     * @return Chuỗi hiển thị bài với một lá bị úp.
-     */
-    public String toStringConcealed() {
-        if (cards.size() < 2) {
-            return "[Card Error]"; //Xử lý trường hợp không đủ bài
-        }
-        //Hiển thị lá đầu tiên là "[Bài úp]" và lá thứ hai
-        return "[No Show Card] | " + cards.get(1).toString();
-    }
     
+    //This method help calculate the score for Ace
     public int calculateScore() {
         int score = 0;
         int numAces = 0;
@@ -65,7 +52,7 @@ public class Hand {
             }
         }
 
-        //Vòng lặp này sẽ xử lý các lá Ace nếu tổng điểm bị bù. Neu nhu la Ace cong lai hon 21 no se tu dong tru di 10 dem tro thanh 1
+        //This loop will decide if Ace card value got bust, it will minus 10 to make the Ace card value become 1
         while (score > 21 && numAces > 0) {
             score -= 10;
             numAces--;
@@ -74,13 +61,4 @@ public class Hand {
         return score;
     }
     
-    @Override
-    public String toString() {
-    	//Chuyen doi de in dong lenh acutal card chu khong phai la memory address.
-        StringBuilder handString = new StringBuilder();
-        for (Card card : this.cards) {
-            handString.append(card.toString()).append(" ");
-        }
-        return handString.toString().trim();
-    }
 }

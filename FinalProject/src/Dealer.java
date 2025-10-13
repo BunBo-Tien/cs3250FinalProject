@@ -10,11 +10,8 @@ public class Dealer extends Player {
 
     // Logic đặc biệt của Dealer: phải rút bài đến khi điểm >= 17
     public void play(Deck deck) {
-        System.out.println("Đến lượt của " + this.getName() + ".");
-        while (this.getHand().calculateScore() < 17) {
-            System.out.println(this.getName() + " phải rút bài...");
+        while (this.getHand().calculateScore() < 17) {      
             this.hit(deck);
         }
-        System.out.println(this.getName() + " đã dừng lại.");
     }
 }

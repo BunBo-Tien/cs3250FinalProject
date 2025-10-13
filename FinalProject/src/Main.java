@@ -1,13 +1,11 @@
 import javafx.application.Application;
 
 /*
- * This is the demo of the black jack game. Some of the comment and console output is written in
- * vietnamese language for me to better understanding what's going on. 
- * 
+ * This is the demo of the black jack game.
  * This is the main class that use to execute the code.
+ * 
+ *  @author Tien Tran
  *
- * Lớp Main - Điểm khởi đầu (entry point) của ứng dụng JavaFX.
- * Nhiệm vụ duy nhất của lớp này là khởi chạy lớp giao diện chính (BlackjackGUI).
  */
 public class Main {
     public static void main(String[] args) {

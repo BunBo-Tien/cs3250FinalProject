@@ -7,7 +7,7 @@ public class Game {
     private Player player;
     private Dealer dealer;
     private boolean isGameOver;
-    private String gameResult; // Lưu trữ chuỗi kết quả để hiển thị trên GUI
+    private String gameResult; //Save the score to display on the GUI 
 
     public Game() {
         this.deck = new Deck();
@@ -16,7 +16,7 @@ public class Game {
     }
 
     
-    	//Bắt đầu một ván chơi mới. Được gọi bởi nút "Ván Mới" trên GUI.
+    	//New Game
         public void startNewGame() {
         isGameOver = false;
         
@@ -25,30 +25,30 @@ public class Game {
         player.getHand().clear();
         dealer.getHand().clear();
 
-        //Chia hai lá bài ban đầu cho mỗi người
+        //2 card got deal for player and dealer
         player.hit(deck);
         dealer.hit(deck);
         player.hit(deck);
         dealer.hit(deck);
 
-        //Kiểm tra trường hợp người chơi có Blackjack ngay từ đầu
+        //check to see if player got 21 at the first deal
         if (player.getHand().calculateScore() == 21) {
-            //Nếu người chơi có Blackjack, lượt chơi kết thúc ngay lập tức
+            //if player got black jack the game end right away
             isGameOver = true;
             determineWinner();
         }
     }
 
     
-        //Xử lý khi người chơi rút thêm bài. Được gọi bởi nút "Hit" trên GUI.
+        //player hit 
         public void playerHits() {
         if (isGameOver) {
-            return; //Không làm gì nếu ván chơi đã kết thúc
+            return;
         }
         
         player.hit(deck);
         
-        //Nếu người chơi bị bù (quá 21 điểm), ván chơi kết thúc
+        //if player got over 21 game end
         if (player.getHand().calculateScore() > 21) {
             isGameOver = true;
             determineWinner();
@@ -56,28 +56,27 @@ public class Game {
     }
 
     
-        // Xử lý khi người chơi dừng lượt. Được gọi bởi nút "Stand" trên GUI.
+        //player stand
         public void playerStands() {
         if (isGameOver) {
-            return; //Không làm gì nếu ván chơi đã kết thúc
+            return;
         }
         
-        //Đến lượt của nhà cái
+        //dealer turn
         dealerTurn();
-        //Xác định người thắng cuộc và kết thúc ván chơi
         isGameOver = true;
         determineWinner();
     }
 
     
-        //Logic tự động chơi của nhà cái.
+        //Logic for dealer
         private void dealerTurn() {
-        //Nhà cái sẽ rút bài cho đến khi có 17 điểm trở lên
+        //Dealer have to keep draw card until it got 17 or above
         	dealer.play(deck);
     }
     
     
-        //Xác định người thắng và đặt thông báo kết quả.
+        //game result
         private void determineWinner() {
         int playerScore = player.getHand().calculateScore();
         int dealerScore = dealer.getHand().calculateScore();
@@ -95,7 +94,7 @@ public class Game {
         }
     }
 
-    //Các phương thức Getter để GUI có thể truy cập và hiển thị thông tin
+    //Getters for GUI can access and display
 
     public Player getPlayer() {
         return player;

@@ -11,17 +11,14 @@ import java.util.List;
 public class Deck {
     private List<Card> cards;
 
-
-    //Hàm khởi tạo của Deck.
-    //Tạo ra một bộ bài 52 lá hoàn chỉnh.
+    //build the card deck
     public Deck() {
         cards = new ArrayList<>();
-        String[] suits = {"♠", "♥", "♦", "♣"}; //Bích, Cơ, Rô, Chuồn
+        String[] suits = {"♠", "♥", "♦", "♣"};
         String[] ranks = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
         for (String suit : suits) {
             for (String rank : ranks) {
-                //Thêm logic để xác định giá trị (value) của lá bài
                 //Added logic to determine the card's value.
                 int value;
                 if (rank.equals("A")) {
@@ -32,7 +29,7 @@ public class Deck {
                     value = Integer.parseInt(rank); //Number cards are their face value
                 }
                 
-                //Gọi hàm khởi tạo đúng với 3 tham số (suit, rank, value)
+
                 //Called the correct constructor with 3 arguments.
                 cards.add(new Card(suit, rank, value));
             }
