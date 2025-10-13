@@ -18,7 +18,7 @@ public class Player {
         return this.hand;
     }
 
-    //this will be extend later to let player put their name in and display on the GUI
+    //this will be extend later to let player put name in and display on the GUI
     public String getName() {
         return this.name;
     }
