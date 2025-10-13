@@ -1,0 +1,23 @@
+Project: Blackjack Game in JavaFX
+This is a simple Blackjack card game built using JavaFX. It features a graphical user interface, card imagery, and sound effects.
+
+Features
+Classic Blackjack rules.
+
+Graphical interface with card images.
+
+Sound effects for key actions (hit, stand, shuffle).
+
+Interactive buttons for game control.
+
+How to Run
+Ensure you have a Java JDK with JavaFX configured in your IDE.
+
+Set up the resources folder (containing cards and sounds) as a "Resources Root".
+
+Run the application from the Main.java class.
+
+Credits and Attributions
+A special thank you to the following creator for their assets:
+
+The card images used in this project were created by Kenny Yip and are from the blackjack-java repository on GitHub.
