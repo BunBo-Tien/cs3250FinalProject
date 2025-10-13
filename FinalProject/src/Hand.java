@@ -1,5 +1,5 @@
 /*
- * Relationship: Hand - Card Aggregation: Mot Hand chua nhieu Card. Nhung Card co the ton tai ngoai Hand
+ * Relationship: Hand - Card Aggregation: Mot Hand chua nhieu Card. Nhung Card van co the ton tai ngoai Hand
  */
 import java.util.ArrayList;
 
