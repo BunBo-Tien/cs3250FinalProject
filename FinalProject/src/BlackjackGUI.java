@@ -37,7 +37,7 @@ public class BlackjackGUI extends Application {
         BorderPane rootLayout = new BorderPane();
         rootLayout.setPadding(new Insets(15));
         rootLayout.setStyle("-fx-background-color: #35654d;");
-        primaryStage.setResizable(false);
+        //primaryStage.setResizable(false);
 
         //Top Section: Title
         Label titleLabel = new Label("Blackjack");
@@ -109,6 +109,7 @@ public class BlackjackGUI extends Application {
         hitButton.setDisable(false);
         standButton.setDisable(false);
         updateView();
+        statusLabel.setText("");
     }
 
     private void handleHitAction() {
@@ -121,6 +122,7 @@ public class BlackjackGUI extends Application {
         game.playerStands();
         updateView();
         endTurn();
+      statusLabel.setText(game.getGameResult());
     }
     
     private void endTurn() {
@@ -159,7 +161,7 @@ public class BlackjackGUI extends Application {
             }
             dealerScoreLabel.setText("Dealer Cards");
         }
-       statusLabel.setText(game.getGameResult());
+       //statusLabel.setText(game.getGameResult());
     }
 
     /**
