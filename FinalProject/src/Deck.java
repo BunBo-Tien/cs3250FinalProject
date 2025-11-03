@@ -11,44 +11,60 @@ import java.util.List;
 public class Deck {
     private List<Card> cards;
 
-    //build the card deck
+    /**
+     * Constructor for Deck. Initializes a new deck of 52 cards and shuffles it.
+     */
     public Deck() {
-        cards = new ArrayList<>();
+        // We create the deck immediately when a Deck object is made.
+        this.cards = new ArrayList<>();
+        createNewDeck();
+    }
+    
+    /**
+     * Fills the cards list with 52 fresh cards and shuffles them.
+     * This helper method is used by the constructor and when the deck runs out of cards.
+     */
+    private void createNewDeck() {
+        cards.clear(); // Clear any old cards
         String[] suits = {"♠", "♥", "♦", "♣"};
         String[] ranks = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
         for (String suit : suits) {
             for (String rank : ranks) {
-                //Added logic to determine the card's value.
                 int value;
                 if (rank.equals("A")) {
-                    value = 11; //Ace is initially 11
+                    value = 11;
                 } else if (rank.equals("K") || rank.equals("Q") || rank.equals("J")) {
-                    value = 10; //Face cards are 10
+                    value = 10;
                 } else {
-                    value = Integer.parseInt(rank); //Number cards are their face value
+                    value = Integer.parseInt(rank);
                 }
-                
-
-                //Called the correct constructor with 3 arguments.
                 cards.add(new Card(suit, rank, value));
             }
         }
+        shuffle(); // Shuffle the newly created deck
     }
 
-
+    /**
+     * Shuffles the cards in the deck randomly.
+     */
     public void shuffle() {
         Collections.shuffle(cards);
     }
 
-
+    /**
+     * Draws one card from the top of the deck.
+     * If the deck is empty, it automatically creates a new, shuffled deck before drawing.
+     * @return The card removed from the deck.
+     */
     public Card drawCard() {
         if (cards.isEmpty()) {
-            //Nếu hết bài, có thể tạo lại và xáo trộn, hoặc xử lý khác
-            //For now, we'll just return null or throw an exception if the deck is empty.
-            return null;
+            System.out.println("Deck is empty. Reshuffling a new deck.");
+            createNewDeck();
         }
         return cards.remove(0);
     }
 }
+
+
 
