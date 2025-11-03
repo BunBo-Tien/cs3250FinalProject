@@ -15,10 +15,11 @@ import java.util.Objects;
 
 public class BlackjackGUI extends Application {
 
+    private Stage primaryStage;
+    private Scene gameScene;
     private Game game;
 
-    //GUI elements we'll need to update.
-    //Note: We're using HBox to hold card images instead of a simple Label.
+    // Game Scene Elements
     private HBox dealerCardsBox;
     private HBox playerCardsBox;
     private Label dealerScoreLabel; 
@@ -26,57 +27,88 @@ public class BlackjackGUI extends Application {
     private Label statusLabel;
     private Button hitButton;
     private Button standButton;
+    private Label playerWinsLabel;
+    private Label dealerWinsLabel;
 
     private final int CARD_WIDTH = 80; 
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         game = new Game();
 
         primaryStage.setTitle("Blackjack");
+        primaryStage.setResizable(false);
+
+        // 1. Build the main game scene first
+        buildGameScene();
+
+        // 2. Create the WelcomeView, telling it what to do when "Play" is clicked
+        WelcomeView welcomeView = new WelcomeView(playerName -> {
+            game.getPlayer().setName(playerName);
+            primaryStage.setScene(gameScene);
+            startNewGame();
+        });
+
+        // 3. Start with the welcome scene
+        primaryStage.setScene(welcomeView.getScene());
+        primaryStage.show();
+    }
+    
+    /**
+     * Builds the main game screen UI.
+     */
+    private void buildGameScene() {
         BorderPane rootLayout = new BorderPane();
         rootLayout.setPadding(new Insets(15));
         rootLayout.setStyle("-fx-background-color: #35654d;");
-        //primaryStage.setResizable(false);
 
-        //Top Section: Title
+        // Top Section: Title and Score
+        VBox topSection = new VBox(10);
+        topSection.setAlignment(Pos.CENTER);
         Label titleLabel = new Label("Blackjack");
         titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
-        rootLayout.setTop(titleLabel);
-        BorderPane.setAlignment(titleLabel, Pos.CENTER);
-        BorderPane.setMargin(titleLabel, new Insets(0, 0, 20, 0));
+        
+        HBox scoreBox = new HBox(50);
+        scoreBox.setAlignment(Pos.CENTER);
+        playerWinsLabel = new Label("Player Wins: 0");
+        dealerWinsLabel = new Label("Dealer Wins: 0");
+        playerWinsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        dealerWinsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        scoreBox.getChildren().addAll(playerWinsLabel, dealerWinsLabel);
+        
+        topSection.getChildren().addAll(titleLabel, scoreBox);
+        rootLayout.setTop(topSection);
+        BorderPane.setMargin(topSection, new Insets(0, 0, 20, 0));
 
-
-        //Center Section: Game area
+        // Center Section: Game area
         VBox gameArea = new VBox(20);
         gameArea.setAlignment(Pos.CENTER);
 
-        //Dealer's area
+        // Dealer's area
         VBox dealerArea = new VBox(10);
         dealerArea.setAlignment(Pos.CENTER);
-        dealerScoreLabel = new Label("Dealer Card:");
+        dealerScoreLabel = new Label("Dealer's Cards:");
         dealerScoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
-        dealerCardsBox = new HBox(-CARD_WIDTH / 2.5); // Negative spacing for card overlap effect
+        dealerCardsBox = new HBox(-CARD_WIDTH / 2.5);
         dealerCardsBox.setAlignment(Pos.CENTER);
         dealerArea.getChildren().addAll(dealerScoreLabel, dealerCardsBox);
 
-        //Player's area
+        // Player's area
         VBox playerArea = new VBox(10);
         playerArea.setAlignment(Pos.CENTER);
-        playerScoreLabel = new Label("Player Card:");
+        playerScoreLabel = new Label("Player's Cards:");
         playerScoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
-        playerCardsBox = new HBox(-CARD_WIDTH / 2.5); // Negative spacing
+        playerCardsBox = new HBox(-CARD_WIDTH / 2.5);
         playerCardsBox.setAlignment(Pos.CENTER);
         playerArea.getChildren().addAll(playerScoreLabel, playerCardsBox);
 
-        //Status label
         statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 16px; -fx-font-style: italic; -fx-text-fill: #ffeb3b;");
-
         gameArea.getChildren().addAll(dealerArea, playerArea, statusLabel);
         rootLayout.setCenter(gameArea);
 
-        //Bottom Section: Control buttons
+        // Bottom Section: Control buttons
         HBox buttonPane = new HBox(15);
         buttonPane.setAlignment(Pos.CENTER);
 
@@ -97,11 +129,7 @@ public class BlackjackGUI extends Application {
         rootLayout.setBottom(buttonPane);
         BorderPane.setMargin(buttonPane, new Insets(20, 0, 0, 0));
 
-        startNewGame();
-
-        Scene scene = new Scene(rootLayout, 700, 550);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        gameScene = new Scene(rootLayout, 700, 550);
     }
     
     private void startNewGame() {
@@ -109,7 +137,6 @@ public class BlackjackGUI extends Application {
         hitButton.setDisable(false);
         standButton.setDisable(false);
         updateView();
-        statusLabel.setText("");
     }
 
     private void handleHitAction() {
@@ -122,7 +149,6 @@ public class BlackjackGUI extends Application {
         game.playerStands();
         updateView();
         endTurn();
-      statusLabel.setText(game.getGameResult());
     }
     
     private void endTurn() {
@@ -130,47 +156,36 @@ public class BlackjackGUI extends Application {
         standButton.setDisable(true);
     }
     
-    //This method refreshes the entire UI, now with images.
     private void updateView() {
-        //Clear previous cards
         playerCardsBox.getChildren().clear();
         dealerCardsBox.getChildren().clear();
         
-
-        //Update player's cards and score
         for (Card card : game.getPlayer().getHand().getCards()) {
-            ImageView cardImage = createCardImageView(card.getImagePath());
-            playerCardsBox.getChildren().add(cardImage);
+            playerCardsBox.getChildren().add(createCardImageView(card.getImagePath()));
         }
-        playerScoreLabel.setText(String.format("Player Cards (%d)", game.getPlayer().getHand().calculateScore()));
+        playerScoreLabel.setText(String.format("%s's Cards (%d)", game.getPlayer().getName(), game.getPlayer().getHand().calculateScore()));
 
-        //Update dealer's cards and score
         if (game.isGameOver()) {
-            // Show all dealer cards
             for (Card card : game.getDealer().getHand().getCards()) {
-                ImageView cardImage = createCardImageView(card.getImagePath());
-                dealerCardsBox.getChildren().add(cardImage);
+                dealerCardsBox.getChildren().add(createCardImageView(card.getImagePath()));
             }
-            dealerScoreLabel.setText(String.format("Dealer Cards (%d)", game.getDealer().getHand().calculateScore()));
+            dealerScoreLabel.setText(String.format("Dealer's Cards (%d)", game.getDealer().getHand().calculateScore()));
         } else {
-            //Show one card and one card back
             dealerCardsBox.getChildren().add(createCardImageView("/cards/BACK.png"));
             if (game.getDealer().getHand().getCards().size() > 1) {
                 Card visibleCard = game.getDealer().getHand().getCards().get(1);
                 dealerCardsBox.getChildren().add(createCardImageView(visibleCard.getImagePath()));
             }
-            dealerScoreLabel.setText("Dealer Cards");
+            dealerScoreLabel.setText("Dealer's Cards");
         }
-       //statusLabel.setText(game.getGameResult());
+       statusLabel.setText(game.getGameResult());
+
+       // Update win counts
+       playerWinsLabel.setText(game.getPlayer().getName() + " Wins: " + game.getPlayerWins());
+       dealerWinsLabel.setText("Dealer Wins: " + game.getDealerWins());
     }
 
-    /**
-     * Helper method to create an ImageView for a card.
-     * It loads the image from the resources folder and configures the ImageView's size.
-     * The path to the image file within the resources folder (e.g., "/cards/A-S.png").
-     */
     private ImageView createCardImageView(String imagePath) {
-        // Use getResource to ensure the image is loaded from the classpath (resources folder)
         Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         ImageView imgView = new ImageView(img);
         imgView.setFitWidth(CARD_WIDTH);
@@ -178,6 +193,10 @@ public class BlackjackGUI extends Application {
         return imgView;
     }
 }
+
+
+
+
 
 
 
