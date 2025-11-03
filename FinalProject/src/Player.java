@@ -22,6 +22,10 @@ public class Player {
     public String getName() {
         return this.name;
     }
+    
+    public void setName(String name) {
+    	this.name = name;
+    }
 
     //Method for player to hit from the Deck
     public void hit(Deck deck) {
