@@ -7,108 +7,92 @@ public class Game {
     private Player player;
     private Dealer dealer;
     private boolean isGameOver;
-    private String gameResult; //Save the score to display on the GUI 
+    private String gameResult;
+
+    // Scorekeeping variables
+    private int playerWins = 0;
+    private int dealerWins = 0;
 
     public Game() {
         this.deck = new Deck();
+        // The player is now created with a default name, which will be updated from the GUI.
         this.player = new Player("Player");
         this.dealer = new Dealer("Dealer");
     }
 
-    
-    	//New Game
-        public void startNewGame() {
+    public void startNewGame() {
         isGameOver = false;
+        gameResult = "Your turn. Hit or Stand?";
         
+        // The deck will auto-reshuffle when needed, so no need to call shuffle here.
         
-        deck.shuffle();
         player.getHand().clear();
         dealer.getHand().clear();
 
-        //2 card got deal for player and dealer
         player.hit(deck);
         dealer.hit(deck);
         player.hit(deck);
         dealer.hit(deck);
 
-        //check to see if player got 21 at the first deal
         if (player.getHand().calculateScore() == 21) {
-            //if player got black jack the game end right away
             isGameOver = true;
             determineWinner();
         }
     }
 
-    
-        //player hit 
-        public void playerHits() {
+    public void playerHits() {
         if (isGameOver) {
             return;
         }
-        
         player.hit(deck);
-        
-        //if player got over 21 game end
         if (player.getHand().calculateScore() > 21) {
             isGameOver = true;
             determineWinner();
         }
     }
 
-    
-        //player stand
-        public void playerStands() {
+    public void playerStands() {
         if (isGameOver) {
             return;
         }
-        
-        //dealer turn
         dealerTurn();
         isGameOver = true;
         determineWinner();
     }
 
-    
-        //Logic for dealer
-        private void dealerTurn() {
-        //Dealer have to keep draw card until it got 17 or above
-        	dealer.play(deck);
+    private void dealerTurn() {
+        dealer.play(deck);
     }
     
-    
-        //game result
-        private void determineWinner() {
+    private void determineWinner() {
         int playerScore = player.getHand().calculateScore();
         int dealerScore = dealer.getHand().calculateScore();
 
         if (playerScore > 21) {
-            gameResult = "Player BUST! Dealer win.";
+            gameResult = "Player BUST! Dealer wins.";
+            dealerWins++;
         } else if (dealerScore > 21) {
-            gameResult = "Dealer BUST! Player win.";
+            gameResult = "Dealer BUST! Player wins.";
+            playerWins++;
         } else if (playerScore > dealerScore) {
-            gameResult = "Player win!";
+            gameResult = "Player wins!";
+            playerWins++;
         } else if (playerScore < dealerScore) {
-            gameResult = "PLayer lose. Dealer win.";
+            gameResult = "Player loses. Dealer wins.";
+            dealerWins++;
         } else {
-            gameResult = "Draw! same point.";
+            gameResult = "Draw!";
         }
     }
 
-    //Getters for GUI can access and display
+    // --- Getters for GUI ---
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Dealer getDealer() {
-        return dealer;
-    }
-
-    public boolean isGameOver() {
-        return isGameOver;
-    }
-
-    public String getGameResult() {
-        return gameResult;
-    }
+    public Player getPlayer() { return player; }
+    public Dealer getDealer() { return dealer; }
+    public boolean isGameOver() { return isGameOver; }
+    public String getGameResult() { return gameResult; }
+    public int getPlayerWins() { return playerWins; }
+    public int getDealerWins() { return dealerWins; }
 }
+
+
