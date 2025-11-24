@@ -8,7 +8,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane; 
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip; 
+import javafx.scene.media.Media;     
+import javafx.scene.media.MediaPlayer; 
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -27,10 +31,15 @@ public class BlackjackGUI extends Application {
     private Label statusLabel;
     private Button hitButton;
     private Button standButton;
+    private Button newGameButton;
     private Label playerWinsLabel;
     private Label dealerWinsLabel;
 
-    private final int CARD_WIDTH = 80; 
+    private MediaPlayer backgroundMusicPlayer;
+
+    private final double DESIGN_WIDTH = 800;
+    private final double DESIGN_HEIGHT = 600;
+    private final int CARD_WIDTH = 100; 
 
     @Override
     public void start(Stage primaryStage) {
@@ -38,47 +47,57 @@ public class BlackjackGUI extends Application {
         game = new Game();
 
         primaryStage.setTitle("Blackjack");
-        primaryStage.setResizable(true);
+        primaryStage.setResizable(true); 
 
-        // 1. Build the main game scene first
         buildGameScene();
 
-        // 2. Create the WelcomeView, telling it what to do when "Play" is clicked
         WelcomeView welcomeView = new WelcomeView(playerName -> {
             game.getPlayer().setName(playerName);
             primaryStage.setScene(gameScene);
+            
+            // BẮT ĐẦU PHÁT NHẠC NỀN
+            playBackgroundMusic();
+            
             startNewGame();
         });
 
-        // 3. Start with the welcome scene
         primaryStage.setScene(welcomeView.getScene());
         primaryStage.show();
     }
     
     /**
-     * Builds the main game screen UI.
+     * Builds the main game screen UI with Responsive Scaling.
      */
     private void buildGameScene() {
-        BorderPane rootLayout = new BorderPane();
-        rootLayout.setPadding(new Insets(15));
-        rootLayout.setStyle("-fx-background-color: #35654d;");
+        // --- BƯỚC 1: Tạo nội dung game (Content Pane) ---
+        // Đây là giao diện gốc với kích thước cố định (DESIGN_WIDTH x DESIGN_HEIGHT)
+        BorderPane contentPane = new BorderPane();
+        contentPane.setPadding(new Insets(20));
+        contentPane.setStyle("-fx-background-color: #35654d;");
+        
+        // Đặt kích thước cố định cho Content Pane để nó không tự co giãn lộn xộn,
+        // mà chúng ta sẽ dùng Scale để phóng to nó.
+        contentPane.setPrefSize(DESIGN_WIDTH, DESIGN_HEIGHT);
+        contentPane.setMaxSize(DESIGN_WIDTH, DESIGN_HEIGHT);
 
+        // --- Xây dựng các thành phần bên trong (giống như trước) ---
+        
         // Top Section: Title and Score
         VBox topSection = new VBox(10);
         topSection.setAlignment(Pos.CENTER);
         Label titleLabel = new Label("Blackjack");
-        titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;");
+        titleLabel.setStyle("-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: white;");
         
         HBox scoreBox = new HBox(50);
         scoreBox.setAlignment(Pos.CENTER);
         playerWinsLabel = new Label("Player Wins: 0");
         dealerWinsLabel = new Label("Dealer Wins: 0");
-        playerWinsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-        dealerWinsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        playerWinsLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white;");
+        dealerWinsLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white;");
         scoreBox.getChildren().addAll(playerWinsLabel, dealerWinsLabel);
         
         topSection.getChildren().addAll(titleLabel, scoreBox);
-        rootLayout.setTop(topSection);
+        contentPane.setTop(topSection);
         BorderPane.setMargin(topSection, new Insets(0, 0, 20, 0));
 
         // Center Section: Game area
@@ -89,7 +108,7 @@ public class BlackjackGUI extends Application {
         VBox dealerArea = new VBox(10);
         dealerArea.setAlignment(Pos.CENTER);
         dealerScoreLabel = new Label("Dealer's Cards:");
-        dealerScoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        dealerScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;");
         dealerCardsBox = new HBox(-CARD_WIDTH / 2.5);
         dealerCardsBox.setAlignment(Pos.CENTER);
         dealerArea.getChildren().addAll(dealerScoreLabel, dealerCardsBox);
@@ -98,18 +117,18 @@ public class BlackjackGUI extends Application {
         VBox playerArea = new VBox(10);
         playerArea.setAlignment(Pos.CENTER);
         playerScoreLabel = new Label("Player's Cards:");
-        playerScoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white; -fx-font-weight: bold;");
+        playerScoreLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;");
         playerCardsBox = new HBox(-CARD_WIDTH / 2.5);
         playerCardsBox.setAlignment(Pos.CENTER);
         playerArea.getChildren().addAll(playerScoreLabel, playerCardsBox);
 
         statusLabel = new Label();
-        statusLabel.setStyle("-fx-font-size: 16px; -fx-font-style: italic; -fx-text-fill: #ffeb3b;");
+        statusLabel.setStyle("-fx-font-size: 22px; -fx-font-style: italic; -fx-text-fill: #ffeb3b;");
         gameArea.getChildren().addAll(dealerArea, playerArea, statusLabel);
-        rootLayout.setCenter(gameArea);
+        contentPane.setCenter(gameArea);
 
         // Bottom Section: Control buttons
-        HBox buttonPane = new HBox(15);
+        HBox buttonPane = new HBox(20);
         buttonPane.setAlignment(Pos.CENTER);
 
         hitButton = new Button("Hit");
@@ -118,34 +137,61 @@ public class BlackjackGUI extends Application {
         standButton = new Button("Stand");
         standButton.setOnAction(event -> handleStandAction());
 
-        Button newGameButton = new Button("New Game");
+        newGameButton = new Button("New Game");
         newGameButton.setOnAction(event -> startNewGame());
         
-        for (Button btn : new Button[]{hitButton, standButton, newGameButton}) {
-            btn.setStyle("-fx-background-color: #c9a43a; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
-        }
+        String buttonStyle = "-fx-background-color: #c9a43a; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 25; -fx-background-radius: 8;";
+        hitButton.setStyle(buttonStyle);
+        standButton.setStyle(buttonStyle);
+        newGameButton.setStyle(buttonStyle);
 
         buttonPane.getChildren().addAll(hitButton, standButton, newGameButton);
-        rootLayout.setBottom(buttonPane);
+        contentPane.setBottom(buttonPane);
         BorderPane.setMargin(buttonPane, new Insets(20, 0, 0, 0));
 
-        gameScene = new Scene(rootLayout, 700, 550);
+        StackPane root = new StackPane(contentPane);
+        root.setStyle("-fx-background-color: #2b503d;");
+
+        root.widthProperty().addListener((obs, oldVal, newVal) -> updateScale(contentPane, root));
+        root.heightProperty().addListener((obs, oldVal, newVal) -> updateScale(contentPane, root));
+
+        // Tạo Scene với kích thước khởi điểm
+        gameScene = new Scene(root, DESIGN_WIDTH, DESIGN_HEIGHT);
+    }
+    
+    private void updateScale(BorderPane content, StackPane parent) {
+        double scaleX = parent.getWidth() / DESIGN_WIDTH;
+        double scaleY = parent.getHeight() / DESIGN_HEIGHT;
+        
+        double scale = Math.min(scaleX, scaleY);
+
+        content.setScaleX(scale);
+        content.setScaleY(scale);
     }
     
     private void startNewGame() {
+        playNewGameSound();
+
         game.startNewGame();
+        
         hitButton.setDisable(false);
         standButton.setDisable(false);
+        newGameButton.setDisable(true); // Khóa nút New Game khi đang chơi
+        
         updateView();
     }
 
     private void handleHitAction() {
+        playHitSound();
+
         game.playerHits();
         updateView();
         if (game.isGameOver()) endTurn();
     }
     
     private void handleStandAction() {
+        playStandSound();
+
         game.playerStands();
         updateView();
         endTurn();
@@ -154,6 +200,7 @@ public class BlackjackGUI extends Application {
     private void endTurn() {
         hitButton.setDisable(true);
         standButton.setDisable(true);
+        newGameButton.setDisable(false); // Mở nút New Game
     }
     
     private void updateView() {
@@ -171,6 +218,7 @@ public class BlackjackGUI extends Application {
             }
             dealerScoreLabel.setText(String.format("Dealer's Cards (%d)", game.getDealer().getHand().calculateScore()));
         } else {
+            // Kiểm tra và hiển thị bài úp
             dealerCardsBox.getChildren().add(createCardImageView("/cards/BACK.png"));
             if (game.getDealer().getHand().getCards().size() > 1) {
                 Card visibleCard = game.getDealer().getHand().getCards().get(1);
@@ -180,20 +228,64 @@ public class BlackjackGUI extends Application {
         }
        statusLabel.setText(game.getGameResult());
 
-       // Update win counts
        playerWinsLabel.setText(game.getPlayer().getName() + " Wins: " + game.getPlayerWins());
        dealerWinsLabel.setText("Dealer Wins: " + game.getDealerWins());
     }
 
     private ImageView createCardImageView(String imagePath) {
+        if (getClass().getResource(imagePath) == null) {
+            System.err.println("Could not find image: " + imagePath);
+            return new ImageView(); 
+        }
         Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
         ImageView imgView = new ImageView(img);
         imgView.setFitWidth(CARD_WIDTH);
         imgView.setPreserveRatio(true);
         return imgView;
     }
-}
 
+    // --- CÁC PHƯƠNG THỨC ÂM THANH GIỮ NGUYÊN ---
+    
+    private void playBackgroundMusic() {
+        try {
+            if (getClass().getResource("/sounds/background.mp3") != null) {
+                String path = getClass().getResource("/sounds/background.mp3").toString();
+                Media media = new Media(path);
+                backgroundMusicPlayer = new MediaPlayer(media);
+                backgroundMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+                backgroundMusicPlayer.setVolume(0.5); 
+                backgroundMusicPlayer.play();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private void playHitSound() {
+        try {
+            if (getClass().getResource("/sounds/hit.mp3") != null) {
+                AudioClip clip = new AudioClip(getClass().getResource("/sounds/hit.mp3").toString());
+                clip.play();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private void playStandSound() {
+        try {
+            if (getClass().getResource("/sounds/stand.mp3") != null) {
+                AudioClip clip = new AudioClip(getClass().getResource("/sounds/stand.mp3").toString());
+                clip.play();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private void playNewGameSound() {
+        try {
+            if (getClass().getResource("/sounds/shuffle.mp3") != null) {
+                AudioClip clip = new AudioClip(getClass().getResource("/sounds/shuffle.mp3").toString());
+                clip.play();
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+}
 
 
 
