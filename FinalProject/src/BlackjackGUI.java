@@ -38,7 +38,7 @@ public class BlackjackGUI extends Application {
         game = new Game();
 
         primaryStage.setTitle("Blackjack");
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
 
         // 1. Build the main game scene first
         buildGameScene();
