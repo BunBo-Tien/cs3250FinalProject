@@ -34,9 +34,9 @@ public class BlackjackGUI extends Application {
     private Button newGameButton;
     private Label playerWinsLabel;
     private Label dealerWinsLabel;
-
     private MediaPlayer backgroundMusicPlayer;
 
+    // Design resolution
     private final double DESIGN_WIDTH = 800;
     private final double DESIGN_HEIGHT = 600;
     private final int CARD_WIDTH = 100; 
@@ -47,20 +47,33 @@ public class BlackjackGUI extends Application {
         game = new Game();
 
         primaryStage.setTitle("Blackjack");
-        primaryStage.setResizable(true); 
+        primaryStage.setResizable(true);
+        
+     // Make icon for the game window.
+        try {
+            Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/cards/Icon-card.png")));
+            primaryStage.getIcons().add(icon);
+        } catch (Exception e) {
+            System.err.println("Không thể tải icon cho cửa sổ: " + e.getMessage());
+        }
 
+        // This is the min window that user can resize down.
+        primaryStage.setMinWidth(600);
+        primaryStage.setMinHeight(500);
+
+        // 1. Build the game scene with scaling
         buildGameScene();
 
+        // 2. Welcome scene create
         WelcomeView welcomeView = new WelcomeView(playerName -> {
             game.getPlayer().setName(playerName);
             primaryStage.setScene(gameScene);
-            
-            // BẮT ĐẦU PHÁT NHẠC NỀN
             playBackgroundMusic();
             
             startNewGame();
         });
 
+        // 3. Start with Welcome scene
         primaryStage.setScene(welcomeView.getScene());
         primaryStage.show();
     }
@@ -69,18 +82,16 @@ public class BlackjackGUI extends Application {
      * Builds the main game screen UI with Responsive Scaling.
      */
     private void buildGameScene() {
-        // --- BƯỚC 1: Tạo nội dung game (Content Pane) ---
-        // Đây là giao diện gốc với kích thước cố định (DESIGN_WIDTH x DESIGN_HEIGHT)
+        // DESIGN_WIDTH x DESIGN_HEIGHT
         BorderPane contentPane = new BorderPane();
         contentPane.setPadding(new Insets(20));
         contentPane.setStyle("-fx-background-color: #35654d;");
         
-        // Đặt kích thước cố định cho Content Pane để nó không tự co giãn lộn xộn,
-        // mà chúng ta sẽ dùng Scale để phóng to nó.
+        //Set the fix for Content Pane
         contentPane.setPrefSize(DESIGN_WIDTH, DESIGN_HEIGHT);
         contentPane.setMaxSize(DESIGN_WIDTH, DESIGN_HEIGHT);
 
-        // --- Xây dựng các thành phần bên trong (giống như trước) ---
+        // Build the element inside
         
         // Top Section: Title and Score
         VBox topSection = new VBox(10);
@@ -155,7 +166,6 @@ public class BlackjackGUI extends Application {
         root.widthProperty().addListener((obs, oldVal, newVal) -> updateScale(contentPane, root));
         root.heightProperty().addListener((obs, oldVal, newVal) -> updateScale(contentPane, root));
 
-        // Tạo Scene với kích thước khởi điểm
         gameScene = new Scene(root, DESIGN_WIDTH, DESIGN_HEIGHT);
     }
     
@@ -164,7 +174,7 @@ public class BlackjackGUI extends Application {
         double scaleY = parent.getHeight() / DESIGN_HEIGHT;
         
         double scale = Math.min(scaleX, scaleY);
-
+        
         content.setScaleX(scale);
         content.setScaleY(scale);
     }
@@ -176,7 +186,7 @@ public class BlackjackGUI extends Application {
         
         hitButton.setDisable(false);
         standButton.setDisable(false);
-        newGameButton.setDisable(true); // Khóa nút New Game khi đang chơi
+        newGameButton.setDisable(true);
         
         updateView();
     }
@@ -218,7 +228,7 @@ public class BlackjackGUI extends Application {
             }
             dealerScoreLabel.setText(String.format("Dealer's Cards (%d)", game.getDealer().getHand().calculateScore()));
         } else {
-            // Kiểm tra và hiển thị bài úp
+            // Check and show the back of the card
             dealerCardsBox.getChildren().add(createCardImageView("/cards/BACK.png"));
             if (game.getDealer().getHand().getCards().size() > 1) {
                 Card visibleCard = game.getDealer().getHand().getCards().get(1);
@@ -244,7 +254,7 @@ public class BlackjackGUI extends Application {
         return imgView;
     }
 
-    // --- CÁC PHƯƠNG THỨC ÂM THANH GIỮ NGUYÊN ---
+    // --- Sound effects ---
     
     private void playBackgroundMusic() {
         try {
